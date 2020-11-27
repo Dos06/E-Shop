@@ -1,0 +1,66 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html">
+
+    <div layout:fragment="site_content">
+        <div class="row mt-4">
+
+            <nav aria-label="breadcrumb" class="w-100">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{'/'}" th:text="#{label.home}"></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{'/search'}" th:text="#{button.search}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${shopitem.name}"></li>
+                </ol>
+            </nav>
+
+            <ul class="ks-cboxtags row mt-2">
+                <li th:each="category : ${categories}">
+                    <div th:if="${shopitem.categories.contains(category)}" class="d-inline">
+                        <form th:action="${'/removecategory'}" class="form-check" method="post">
+                            <input disabled type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                            <input disabled type="hidden" name="category_id" th:value="${category.id}">
+                            <input disabled type="checkbox" th:id="'cat' + ${category.id}" class="shopitem-category" onchange="this.form.submit()" name="category_id" th:value="${category.id}" th:checked="${shopitem.categories.contains(category)}">
+                            <label th:for="'cat' + ${category.id}" th:text="${category.name}"></label>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="alert alert-secondary shadow">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h1 th:text="${shopitem.name}"></h1>
+                        <h3 th:text="${shopitem.brand.name} + ' - ' + ${shopitem.brand.country.name}" class="text-danger"></h3>
+                        <h1 th:text="'$ ' + ${shopitem.price}" class="my-4"></h1>
+                        <p th:text="${shopitem.description}" style="font-size: 24px;"></p>
+                        <div>
+                            <small class="text-muted">
+                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 1}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 1}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 2}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 2}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 3}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 3}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 4}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 4}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 5}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 5}" style="color: grey;"></span>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <img th:src="${shopitem.pictureURLlrg}" class="w-100 rounded">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</html>

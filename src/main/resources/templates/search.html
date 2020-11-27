@@ -1,0 +1,148 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html">
+
+    <div layout:fragment="site_content">
+        <div class="row mt-4">
+            <form th:action="@{'/search'}" class="row w-100" method="get">
+                <div class="form-group col-sm-2">
+                    <label th:text="#{label.name}"></label>
+                    <input type="text" class="form-control" name="shopitem_name" th:placeholder="#{label.name}" th:value="${(param.shopitem_name)}">
+                </div>
+                <div class="form-group col-sm-2">
+                    <label th:text="#{label.brand}"></label>
+                    <select name="brand_id" class="form-control">
+                        <option selected value="0" th:text="#{label.choose}"></option>
+                        <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name} + ' - ' + ${brand.country.name} + ' (' + ${brand.country.code} + ')'"></option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label th:text="#{label.category}"></label>
+                    <select name="category_id" class="form-control">
+                        <option selected value="0" th:text="#{label.choose}"></option>
+                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label th:text="#{label.fromprice}"></label>
+                    <input type="number" class="form-control" name="shopitem_fromprice" min="0" th:placeholder="#{label.fromprice}" th:value="${(param.shopitem_fromprice)}">
+                </div>
+                <div class="form-group col-sm-2">
+                    <label th:text="#{label.toprice}"></label>
+                    <input type="number" class="form-control" name="shopitem_toprice" min="0" th:placeholder="#{label.toprice}" th:value="${(param.shopitem_toprice)}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <label th:text="#{label.stars}"></label>
+                    <input type="number" class="form-control" name="shopitem_stars" min="0" max="5" th:placeholder="#{label.stars}" th:value="${(param.shopitem_stars)}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <label class="d-block">&#4448;</label>
+                    <button class="btn btn-dark" th:text="#{button.filter}"></button>
+                </div>
+            </form>
+        </div>
+
+<!--        <div class="row w-100">-->
+<!--            <button type="button" class="btn btn-dark btn-lg" data-toggle="modal" data-target="#add_shopitem" th:text="#{button.add}"></button>-->
+<!--        </div>-->
+
+        <div class="row w-100 mt-4 justify-content-between">
+            <div><h3 th:text="#{label.search-results}"></h3></div>
+            <div class="row">
+                <h5 th:text="#{label.order-by-price} + ':'" class="align-self-center mr-3"></h5>
+                <div class="btn-group" role="group">
+                    <a th:href="@{/search(shopitem_name=${(param.shopitem_name)}, shopitem_fromprice=${(param.shopitem_fromprice)}, shopitem_toprice=${(param.shopitem_toprice)}, shopitem_stars=${(param.shopitem_stars)}, order='asc', brand_id=${(param.brand_id)}, category_id=${(param.category_id)})}"
+                       class="btn btn-secondary" th:text="#{label.ascending}"></a>
+                    <a th:href="@{/search(shopitem_name=${(param.shopitem_name)}, shopitem_fromprice=${(param.shopitem_fromprice)}, shopitem_toprice=${(param.shopitem_toprice)}, shopitem_stars=${(param.shopitem_stars)}, order='desc', brand_id=${(param.brand_id)}, category_id=${(param.category_id)})}"
+                       class="btn btn-secondary" th:text="#{label.descending}"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add_shopitem" tabindex="-1" aria-labelledby="AddShopItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="AddShopItemModalLabel" th:text="#{label.addnew}"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form th:action="@{'/addshopitem'}" method="post">
+                            <div class="form-group">
+                                <label th:text="#{label.name}"></label>
+                                <input type="text" class="form-control" name="shopitem_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:text="#{label.description}"></label>
+                                <textarea type="text" class="form-control" name="shopitem_description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label th:text="#{label.price}"></label>
+                                <input type="number" class="form-control" name="shopitem_price" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:text="#{label.amount}"></label>
+                                <input type="number" class="form-control" name="shopitem_amount" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:text="#{label.stars}"></label>
+                                <input type="number" class="form-control" name="shopitem_stars" min="0" max="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:text="#{label.pictureurl}"></label>
+                                <input type="text" class="form-control" name="shopitem_pictureurl">
+                            </div>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                            <button type="submit" class="btn btn-dark" th:text="#{button.add}"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row mt-4">
+            <div class="row row-cols-1 row-cols-md-3">
+
+                <div class="col mb-4" th:each="shopItem : ${shopItems}">
+                    <div class="card">
+                        <img th:src="${shopItem.pictureURL}" class="card-img-top" style="max-height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title"><a th:href="@{'/properties/' + ${shopItem.id}}" th:text="${shopItem.name}"></a></h5>
+                            <h5 class="card-title" th:text="${'$ ' + shopItem.price}"></h5>
+                            <p class="card-text" th:text="${shopItem.description}"></p>
+                            <span>
+                                <h6 class="d-inline" th:text="#{label.brand} + ': '"></h6>
+                                <span class="text-danger" th:text="${shopItem.brand.name} + ', ' + ${shopItem.brand.country.name}"></span>
+                            </span>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">
+                                <span th:class="${'fa fa-star'}" th:if="${shopItem.stars >= 1}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star'}" th:unless="${shopItem.stars >= 1}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star'}" th:if="${shopItem.stars >= 2}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star'}" th:unless="${shopItem.stars >= 2}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star'}" th:if="${shopItem.stars >= 3}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star'}" th:unless="${shopItem.stars >= 3}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star'}" th:if="${shopItem.stars >= 4}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star'}" th:unless="${shopItem.stars >= 4}" style="color: grey;"></span>
+
+                                <span th:class="${'fa fa-star'}" th:if="${shopItem.stars >= 5}" style="color: orange;"></span>
+                                <span th:class="${'fa fa-star'}" th:unless="${shopItem.stars >= 5}" style="color: grey;"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</html>

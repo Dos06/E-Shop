@@ -1,0 +1,106 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/admin.html">
+
+    <div layout:fragment="site_content">
+        <div class="row mt-4">
+            <div class="col-sm-8 offset-sm-2 p-0">
+                <ul class="ks-cboxtags row">
+                    <li th:each="category : ${categories}">
+                        <div th:if="${shopitem.categories.contains(category)}" class="d-inline">
+                            <form th:action="${'/removecategory'}" class="form-check" method="post">
+                                <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                <input type="hidden" name="category_id" th:value="${category.id}">
+                                <input type="checkbox" th:id="'cat' + ${category.id}" class="shopitem-category" onchange="this.form.submit()" name="category_id" th:value="${category.id}" th:checked="${shopitem.categories.contains(category)}">
+                                <label th:for="'cat' + ${category.id}" th:text="${category.name}"></label>
+                            </form>
+                        </div>
+
+                        <div th:unless="${shopitem.categories.contains(category)}" class="d-inline">
+                            <form th:action="${'/assigncategory'}" class="form-check" method="post">
+                                <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                <input type="checkbox" th:id="'cat' + ${category.id}" class="shopitem-category" onchange="this.form.submit()" name="category_id" th:value="${category.id}" th:checked="${shopitem.categories.contains(category)}">
+                                <label th:for="'cat' + ${category.id}" th:text="${category.name}"></label>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <form th:action="@{'/saveshopitem'}" class="col-sm-8 offset-sm-2" method="post">
+                <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                <div class="form-group">
+                    <label th:text="#{label.name}"></label>
+                    <input type="text" class="form-control" name="shopitem_name" required th:value="${shopitem.name}">
+                </div>
+
+
+                <ul class="ks-cboxtags">
+                    <li><input type="checkbox" id="checkboxOne" name="top" th:checked="${shopitem.top}"><label for="checkboxOne" th:text="#{label.in-top-page}"></label></li>
+                </ul>
+
+
+<!--                <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="_checkbox" name="top" th:checked="${shopitem.top}">-->
+<!--                    <label class="form-check-label" for="_checkbox" th:text="#{label.in-top-page}"></label>-->
+<!--                </div>-->
+                <div class="form-group">
+                    <label th:text="#{label.description}"></label>
+                    <textarea type="text" class="form-control" name="shopitem_description" required th:text="${shopitem.getDescription()}" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.price}"></label>
+                    <input type="number" class="form-control" name="shopitem_price" required th:value="${shopitem.price}">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.amount}"></label>
+                    <input type="number" class="form-control" name="shopitem_amount" required th:value="${shopitem.amount}">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.stars}"></label>
+                    <input type="number" class="form-control" name="shopitem_stars" required th:value="${shopitem.stars}" min="0" max="5">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.pictureurl}"></label>
+                    <input type="text" class="form-control" name="shopitem_pictureurl" required th:value="${shopitem.pictureURL}">
+                    <img th:src="${shopitem.pictureURL}" class="rounded mt-2" style="width: 300px;">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.pictureurllrg}"></label>
+                    <input type="text" class="form-control" name="shopitem_pictureurllrg" required th:value="${shopitem.pictureURLlrg}">
+                    <img th:src="${shopitem.pictureURLlrg}" class="rounded mt-2" style="width: 400px;">
+                </div>
+                <div class="form-group">
+                    <label th:text="#{label.brand}"></label>
+                    <select name="brand_id" class="form-control" required>
+                        <option selected disabled th:text="#{label.choose}"></option>
+                        <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name} + ' - ' + ${brand.country.name} + ' (' + ${brand.country.code} + ')'" th:selected="${shopitem!=null && shopitem.brand!=null && shopitem.brand.id==brand.id}"></option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#delete_shopitem" th:text="#{button.delete}"></button>
+                <button type="submit" class="btn btn-dark" th:text="#{button.save}"></button>
+            </form>
+        </div>
+
+        <div class="modal fade" id="delete_shopitem" tabindex="-1" aria-labelledby="DeleteShopItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="DeleteShopItemModalLabel" th:text="#{label.delete}"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <form th:action="@{'/deleteshopitem'}" method="post">
+                            <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                            <button type="submit" class="btn btn-dark" th:text="#{button.delete}"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</html>
