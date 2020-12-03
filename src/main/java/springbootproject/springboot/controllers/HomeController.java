@@ -1,8 +1,13 @@
 package springbootproject.springboot.controllers;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,13 +15,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springbootproject.springboot.entities.*;
 import springbootproject.springboot.services.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +46,13 @@ public class HomeController {
     private RoleService roleService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Value("${file.avatar.viewPath}")
+    private String viewPath;
+    @Value("${file.avatar.uploadPath}")
+    private String uploadPath;
+    @Value("${file.avatar.defaultPicture}")
+    private String defaultPicture;
 
     @GetMapping(value = "/")
     public String index(Model model) {
@@ -216,6 +231,26 @@ public class HomeController {
         return "profile";
     }
 
+    @GetMapping(value = "/viewphoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    @PreAuthorize("isAuthenticated()")
+    public @ResponseBody byte[] viewProfilePhoto(@PathVariable(name = "url") String url) throws IOException {
+        String pictureUrl = viewPath + "/" + defaultPicture;
+        if (url != null && !url.equals("null")) {
+            pictureUrl = viewPath + "/" + url + ".jpg";
+        }
+
+        InputStream inputStream;
+        try {
+            ClassPathResource resource = new ClassPathResource(pictureUrl);
+            inputStream = resource.getInputStream();
+        } catch (Exception e) {
+            ClassPathResource resource = new ClassPathResource(viewPath + "/" + defaultPicture);
+            inputStream = resource.getInputStream();
+            e.printStackTrace();
+        }
+        return IOUtils.toByteArray(inputStream);
+    }
+
     private User getUserData() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if ( !(authentication instanceof AnonymousAuthenticationToken) ) {
@@ -233,7 +268,36 @@ public class HomeController {
 
 
 
-    @PostMapping(value = "saveuserpassword")
+
+
+
+    @PostMapping(value = "/uploadavatar")
+    @PreAuthorize("isAuthenticated()")
+    public String uploadAvatar(
+            @RequestParam(name = "user_avatar") MultipartFile user_avatar
+    ) {
+        String redirect = "error";
+
+        if (user_avatar.getContentType().equals("image/jpeg") || user_avatar.getContentType().equals("image/png")) {
+            try {
+                User currentUser = getUserData();
+                String picName = DigestUtils.sha1Hex("avatar_" + currentUser.getId() + "_!Picture");
+
+                byte[] bytes = user_avatar.getBytes();
+                Path path = Paths.get(uploadPath + picName + ".jpg");
+                Files.write(path, bytes);
+                currentUser.setPictureUrl(picName);
+                userService.saveUser(currentUser);
+                redirect = "success";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return "redirect:/profile?" + redirect;
+    }
+
+    @PostMapping(value = "/saveuserpassword")
     @PreAuthorize("isAuthenticated()")
     public String saveUserPassword(
             Model model,
@@ -262,7 +326,7 @@ public class HomeController {
     }
 
 
-    @PostMapping(value = "saveuser")
+    @PostMapping(value = "/saveuser")
     @PreAuthorize("isAuthenticated()")
     public String saveUser(
             Model model,
@@ -282,7 +346,7 @@ public class HomeController {
         return "redirect:/profile?" + redirect;
     }
 
-    @PostMapping(value = "saveuserroles")
+    @PostMapping(value = "/saveuserroles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String saveUserRoles(
             @RequestParam(name = "id") int id,
@@ -332,7 +396,14 @@ public class HomeController {
         if (user == null && password.equals(repassword)) {
             List<Role> roles = new ArrayList<>(1);
             roles.add(roleService.getRoleByName("ROLE_USER"));
-            userService.addUser(new User(0, email, password, name, roles));
+
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setPassword(password);
+            newUser.setFullName(name);
+            newUser.setRoles(roles);
+//            userService.addUser(new User(0, email, password, name, null, roles));
+            userService.addUser(newUser);
             redirect = "login?success";
         }
         return "redirect:/" + redirect;

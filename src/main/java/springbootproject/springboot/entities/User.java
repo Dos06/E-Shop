@@ -28,6 +28,9 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "pictureUrl")
+    private String pictureUrl;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 }

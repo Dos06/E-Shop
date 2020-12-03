@@ -20,6 +20,21 @@
                     </button>
                 </div>
 
+                <div class="row col-sm-8 offset-sm-2">
+                    <img th:src="@{'/viewphoto/' + ${currentUser.pictureUrl}}" class="col-sm-4 my-4 rounded">
+                    <div class="col-sm-4 offset-sm-2">
+                        <form th:action="@{'/uploadavatar'}" method="post" enctype="multipart/form-data">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="customFile" name="user_avatar">
+                                <label class="custom-file-label" for="customFile" th:text="#{label.choose}"></label>
+                            </div>
+                            <button class="btn btn-dark col-8 offset-2 mt-2" th:text="#{button.save}"></button>
+                        </form>
+                    </div>
+                </div>
+
+                <hr>
+
                 <form th:action="@{'/saveuser'}" class="col-sm-8 offset-sm-2" method="post">
                     <input type="hidden" name="id" th:value="${currentUser.id}">
                     <div class="form-group">
