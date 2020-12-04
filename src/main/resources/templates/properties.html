@@ -56,6 +56,20 @@
                         <img th:src="${shopitem.pictureURLlrg}" class="w-100 rounded">
                     </div>
                 </div>
+
+                <div th:if="${pictures != null && pictures.size() > 0}" class="row">
+                    <section id="slideshow">
+                        <div class="entire-content">
+                            <div class="content-carrousel">
+<!--                                <figure class="shadow"><img th:src="${shopitem.pictureURLlrg}"></figure>-->
+<!--                                <figure class="shadow"><img th:src="${shopitem.pictureURL}"></figure>-->
+                                <figure th:each="picture : ${pictures}" class="shadow"><img th:src="@{'/shopitem/' + ${picture.url}}"></figure>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+
             </div>
 
         </div>

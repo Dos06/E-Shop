@@ -5,6 +5,61 @@
     <div layout:fragment="site_content">
         <div class="row mt-4">
             <div class="col-sm-8 offset-sm-2 p-0">
+
+                <div th:if="${param.error != null}" class="alert alert-dark alert-dismissible fade show" role="alert">
+                    <strong th:text="#{label.incorrect-values}"></strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong th:text="#{label.saved}"></strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form th:action="@{'/upload_shopitem_photo'}" class="row col-12" method="post" enctype="multipart/form-data">
+                    <div class="custom-file col-sm-3">
+                        <input type="hidden" name="id" th:value="${shopitem.id}">
+                        <input type="file" class="custom-file-input" id="customFile" name="shopitem_photo">
+                        <label class="custom-file-label" for="customFile" th:text="#{label.choose}"></label>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <button class="btn btn-dark col-sm-2" th:text="#{button.save}"></button>
+                </form>
+
+                <div class="row col-12 mb-3">
+                    <div th:if="${pictures != null && pictures.size() > 0}" th:each="picture : ${pictures}" class="col-sm-6 my-2">
+                        <button type="button" class="btn btn-dark btn-sm col-2" data-toggle="modal" th:data-target="${'#deletepic' + picture.id}" th:text="#{button.delete}"></button>
+                        <div class="col-2 d-inline">
+                            <img th:src="@{'/shopitem/' + ${picture.url}}" style="max-width: 150px; max-height: 100px;" class="rounded">
+                        </div>
+
+                        <div class="modal fade" th:id="${'deletepic' + picture.id}" tabindex="-1" role="dialog" th:aria-labelledby="${'deletepic' + picture.id}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" th:id="${'deletepic' + picture.id}" th:text="#{button.delete}"></h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form th:action="@{'/deletepicture'}" method="post">
+                                            <input type="hidden" name="picture_id" th:value="${picture.id}">
+                                            <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                                            <button type="submit" class="btn btn-dark" th:text="#{button.delete}"></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
                 <ul class="ks-cboxtags row">
                     <li th:each="category : ${categories}">
                         <div th:if="${shopitem.categories.contains(category)}" class="d-inline">

@@ -2,11 +2,9 @@ package springbootproject.springboot.controllers;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -25,7 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,14 +43,21 @@ public class HomeController {
     @Autowired
     private RoleService roleService;
     @Autowired
+    private PictureService pictureService;
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Value("${file.avatar.viewPath}")
-    private String viewPath;
+    private String viewPathAvatars;
     @Value("${file.avatar.uploadPath}")
-    private String uploadPath;
+    private String uploadPathAvatars;
     @Value("${file.avatar.defaultPicture}")
     private String defaultPicture;
+
+    @Value("${file.shopitem.viewPath}")
+    private String viewPathShopItems;
+    @Value("${file.shopitem.uploadPath}")
+    private String uploadPathShopItems;
 
     @GetMapping(value = "/")
     public String index(Model model) {
@@ -101,6 +106,7 @@ public class HomeController {
     }
 
     @GetMapping(value = "/details/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public String details(Model model, @PathVariable(name = "id") int id) {
         ShopItem shopItem = shopItemService.getShopItem(id);
         model.addAttribute("shopitem", shopItem);
@@ -113,6 +119,9 @@ public class HomeController {
 
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
+
+        List<Picture> pictures = pictureService.getPicturesByShopItem(shopItem);
+        model.addAttribute("pictures", pictures);
 
         model.addAttribute("currentUser", getUserData());
 
@@ -132,6 +141,9 @@ public class HomeController {
 
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
+
+        List<Picture> pictures = pictureService.getPicturesByShopItem(shopItem);
+        model.addAttribute("pictures", pictures);
 
         model.addAttribute("currentUser", getUserData());
 
@@ -234,9 +246,9 @@ public class HomeController {
     @GetMapping(value = "/viewphoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody byte[] viewProfilePhoto(@PathVariable(name = "url") String url) throws IOException {
-        String pictureUrl = viewPath + defaultPicture;
+        String pictureUrl = viewPathAvatars + "/" + defaultPicture;
         if (url != null && !url.equals("null")) {
-            pictureUrl = viewPath + url + ".jpg";
+            pictureUrl = viewPathAvatars + "/" + url + ".jpg";
         }
 
         InputStream inputStream;
@@ -244,11 +256,31 @@ public class HomeController {
             ClassPathResource resource = new ClassPathResource(pictureUrl);
             inputStream = resource.getInputStream();
         } catch (Exception e) {
-            ClassPathResource resource = new ClassPathResource(viewPath + defaultPicture);
+            ClassPathResource resource = new ClassPathResource(pictureUrl);
             inputStream = resource.getInputStream();
             e.printStackTrace();
         }
         return IOUtils.toByteArray(inputStream);
+    }
+
+    @GetMapping(value = "/shopitem/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    public @ResponseBody byte[] viewShopItemPhoto(@PathVariable(name = "url") String url) throws IOException {
+        String pictureUrl;
+        if (url != null && !url.equals("null")) {
+            pictureUrl = viewPathShopItems + "/" + url + ".jpg";
+
+            InputStream inputStream;
+            try {
+                ClassPathResource resource = new ClassPathResource(pictureUrl);
+                inputStream = resource.getInputStream();
+            } catch (Exception e) {
+                ClassPathResource resource = new ClassPathResource(pictureUrl);
+                inputStream = resource.getInputStream();
+                e.printStackTrace();
+            }
+            return IOUtils.toByteArray(inputStream);
+        }
+        return null;
     }
 
     private User getUserData() {
@@ -271,6 +303,37 @@ public class HomeController {
 
 
 
+    @PostMapping(value = "/upload_shopitem_photo")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    public String uploadShopItemPhoto(
+            @RequestParam(name = "id") int id,
+            @RequestParam(name = "shopitem_photo") MultipartFile shopitem_photo
+    ) {
+        String redirect = "error";
+
+        ShopItem shopItem = shopItemService.getShopItem(id);
+        if (shopItem != null) {
+            if (shopitem_photo.getContentType().equals("image/jpeg") || shopitem_photo.getContentType().equals("image/png")) {
+                try {
+                    Picture picture = new Picture(0, null, LocalDateTime.now(), shopItem);
+                    String picName = DigestUtils.sha1Hex("photo_" + LocalDateTime.now() + shopItem.getId() + "_!Picture");
+                    picture.setUrl(picName);
+
+                    byte[] bytes = shopitem_photo.getBytes();
+                    Path path = Paths.get(uploadPathShopItems + "/" + picName + ".jpg");
+                    Files.write(path, bytes);
+                    pictureService.addPicture(picture);
+                    redirect = "success";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        assert shopItem != null;
+        return "redirect:/details/" + shopItem.getId() + "?" + redirect;
+    }
+
     @PostMapping(value = "/uploadavatar")
     @PreAuthorize("isAuthenticated()")
     public String uploadAvatar(
@@ -284,7 +347,7 @@ public class HomeController {
                 String picName = DigestUtils.sha1Hex("avatar_" + currentUser.getId() + "_!Picture");
 
                 byte[] bytes = user_avatar.getBytes();
-                Path path = Paths.get(uploadPath + picName + ".jpg");
+                Path path = Paths.get(uploadPathAvatars + "/" + picName + ".jpg");
                 Files.write(path, bytes);
                 currentUser.setPictureUrl(picName);
                 userService.saveUser(currentUser);
@@ -293,7 +356,6 @@ public class HomeController {
                 e.printStackTrace();
             }
         }
-
         return "redirect:/profile?" + redirect;
     }
 
@@ -504,6 +566,19 @@ public class HomeController {
             shopItemService.deleteShopItem(shopItem);
         }
         return "redirect:/admin";
+    }
+
+    @PostMapping(value = "/deletepicture")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    public String deletePicture(@RequestParam(name = "picture_id", defaultValue = "0") int id,
+                                @RequestParam(name = "shopitem_id", defaultValue = "0") int shopitem_id) {
+        String redirect = "error";
+        Picture picture = pictureService.getPicture(id);
+        if (picture != null) {
+            pictureService.deletePicture(picture);
+            redirect = "success";
+        }
+        return "redirect:/details/" + shopitem_id + "?" + redirect;
     }
 
     @PostMapping(value = "/assigncategory")

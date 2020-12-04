@@ -43,68 +43,6 @@ public interface ShopItemRepository extends JpaRepository<ShopItem, Integer> {
 
 
 
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndBrand(String name,
-                                                                                                                 int priceFrom,
-                                                                                                                 int priceTo,
-                                                                                                                 int stars,
-                                                                                                                 int amount,
-                                                                                                                 Brand brand);
-
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndBrandOrderByPriceAsc(String name,
-                                                                                                                            int priceFrom,
-                                                                                                                            int priceTo,
-                                                                                                                            int stars,
-                                                                                                                            int amount,
-                                                                                                                            Brand brand);
-
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndBrandOrderByPriceDesc(String name,
-                                                                                                                             int priceFrom,
-                                                                                                                             int priceTo,
-                                                                                                                             int stars,
-                                                                                                                             int amount,
-                                                                                                                             Brand brand);
-
-
-
-
-
-
-
-
-
-
-
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndCategoriesContaining(String name,
-                                                                                                      int priceFrom,
-                                                                                                      int priceTo,
-                                                                                                      int stars,
-                                                                                                      int amount,
-                                                                                                      Category category);
-
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndCategoriesContainingOrderByPriceAsc(String name,
-                                                                                                                  int priceFrom,
-                                                                                                                  int priceTo,
-                                                                                                                  int stars,
-                                                                                                                  int amount,
-                                                                                                                  Category category);
-
-    List<ShopItem> findAllByNameContainingAndPriceBetweenAndStarsGreaterThanEqualAndAmountGreaterThanAndCategoriesContainingOrderByPriceDesc(String name,
-                                                                                                                      int priceFrom,
-                                                                                                                      int priceTo,
-                                                                                                                      int stars,
-                                                                                                                      int amount,
-                                                                                                                      Category category);
-
-
-
-
-
-
-
-
-
-
-
 
 
 
