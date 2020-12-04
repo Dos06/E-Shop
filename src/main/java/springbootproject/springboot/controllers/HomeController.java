@@ -234,9 +234,9 @@ public class HomeController {
     @GetMapping(value = "/viewphoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody byte[] viewProfilePhoto(@PathVariable(name = "url") String url) throws IOException {
-        String pictureUrl = viewPath + "/" + defaultPicture;
+        String pictureUrl = viewPath + defaultPicture;
         if (url != null && !url.equals("null")) {
-            pictureUrl = viewPath + "/" + url + ".jpg";
+            pictureUrl = viewPath + url + ".jpg";
         }
 
         InputStream inputStream;
@@ -244,7 +244,7 @@ public class HomeController {
             ClassPathResource resource = new ClassPathResource(pictureUrl);
             inputStream = resource.getInputStream();
         } catch (Exception e) {
-            ClassPathResource resource = new ClassPathResource(viewPath + "/" + defaultPicture);
+            ClassPathResource resource = new ClassPathResource(viewPath + defaultPicture);
             inputStream = resource.getInputStream();
             e.printStackTrace();
         }

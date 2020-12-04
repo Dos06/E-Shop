@@ -21,9 +21,9 @@
                 </div>
 
                 <div class="row col-sm-8 offset-sm-2">
-                    <img th:src="@{'/viewphoto/' + ${currentUser.pictureUrl}}" class="col-sm-4 my-4 rounded">
+                    <img th:src="@{'/viewphoto/' + ${currentUser.pictureUrl}}" class="col-sm-4 rounded">
                     <div class="col-sm-4 offset-sm-2">
-                        <form th:action="@{'/uploadavatar'}" method="post" enctype="multipart/form-data">
+                        <form th:action="@{'/uploadavatar'}" class="mt-5" method="post" enctype="multipart/form-data">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="customFile" name="user_avatar">
                                 <label class="custom-file-label" for="customFile" th:text="#{label.choose}"></label>
