@@ -243,6 +243,22 @@ public class HomeController {
         return "profile";
     }
 
+    @GetMapping(value = "/cart")
+    public String cart(Model model) {
+        List<Brand> brands = shopItemService.getBrands();
+        model.addAttribute("brands", brands);
+
+        List<Country> countries = countryService.getAllCountries();
+        model.addAttribute("countries", countries);
+
+        List<Category> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
+
+        model.addAttribute("currentUser", getUserData());
+
+        return "cart";
+    }
+
     @GetMapping(value = "/viewphoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
     @PreAuthorize("isAuthenticated()")
     public @ResponseBody byte[] viewProfilePhoto(@PathVariable(name = "url") String url) throws IOException {

@@ -1,0 +1,77 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html">
+
+    <div layout:fragment="site_content">
+        <div class="row mt-4">
+            <div class="col-12">
+
+                <div th:if="${param.error != null}" class="alert alert-dark alert-dismissible fade show col-sm-8 offset-sm-2" role="alert">
+                    <strong th:text="#{label.incorrect-values}"></strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show col-sm-8 offset-sm-2" role="alert">
+                    <strong th:text="#{label.saved}"></strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="text-light bg-dark">
+                        <tr>
+                            <td th:text="#{label.name}"></td>
+                            <td th:text="#{label.price}"></td>
+                            <td th:text="#{label.quantity}"></td>
+                            <td th:text="#{label.amount}"></td>
+                            <td th:text="#{label.operations}"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+<!--                        <tr th:each="item : ${cart}">-->
+<!--                            <td th:text="${item.shopitem.name}"></td>-->
+<!--                            <td th:text="${item.shopitem.price}"></td>-->
+<!--                            <td th:text="${item.quantity}"></td>-->
+<!--                            <td th:text="${item.shopitem.price * item.quantity}"></td>-->
+<!--                            <td th:text="${item.shopitem.price * item.quantity}"></td>-->
+<!--                        </tr>-->
+                            <tr>
+                                <td th:text="'xiaomi'"></td>
+                                <td th:text="'150'"></td>
+                                <td th:text="'3'"></td>
+                                <td th:text="'450'"></td>
+                                <td class="row mx-0">
+                                    <div class="qty">
+                                        <span class="minus bg-dark">-</span>
+                                        <input type="number" class="count" name="qty" value="1">
+                                        <span class="plus bg-dark">+</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td th:text="'xiaomi'"></td>
+                            </tr>
+                            <tr>
+                                <td th:text="'xiaomi'"></td>
+                            </tr>
+                            <tr>
+                                <td th:text="'xiaomi'"></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="3" ><h2 th:text="#{label.total-to-pay} + ':'"></h2></td>
+                                <td><h2 th:text="'$ 0'"></h2></td>
+                            </tr>
+                    </tbody>
+                </table>
+
+<!--                <h2 class="text-center" th:text="#{label.total-to-pay} + ': $ 1500'"></h2>-->
+
+            </div>
+        </div>
+
+    </div>
+
+</html>

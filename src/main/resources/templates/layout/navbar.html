@@ -18,6 +18,8 @@
             </div>
         </li>
     </ul>
+<!--    <a th:href="${'/cart'}" class="nav-link text-light my-1" th:text="'Cart (' + ${cart.size()} + ')'"></a>-->
+    <a th:href="${'/cart'}" class="nav-link text-light my-1" th:text="'Cart (0)'"></a>
     <a th:href="${'/profile'}" sec:authorize="isAuthenticated()" class="nav-link text-light my-1" th:text="${currentUser.fullName}"></a>
     <a class="btn btn-secondary btn-sm" href="/login" sec:authorize="isAnonymous()" th:text="#{button.signin}"></a>
     <a class="btn btn-secondary btn-sm" href="JavaScript:void(0)" onclick="document.getElementById('logoutForm').submit()" sec:authorize="isAuthenticated()" th:text="#{button.logout}"></a>
