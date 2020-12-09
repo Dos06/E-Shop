@@ -43,7 +43,66 @@
                     </tbody>
                 </table>
 
-<!--                <h2 class="text-center" th:text="#{label.total-to-pay} + ': $ 1500'"></h2>-->
+                <form th:if="${session.totalQuantity > 0}" th:action="${'/delete-cart'}" method="post" class="col-12">
+                    <div class="row float-right">
+                        <button class="btn btn-lg btn-dark" type="button" data-toggle="modal" data-target="#pay" th:inline="text">
+                            <i class="far fa-credit-card"></i>
+                            [[#{button.check-in}]]
+                        </button>
+                        <button class="btn btn-lg btn-danger ml-2" th:inline="text">
+                            <i class="fas fa-trash-alt"></i>
+                            [[#{button.clear-cart}]]
+                        </button>
+                    </div>
+                </form>
+
+                <div class="modal fade" id="pay" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="payModalLabel">
+                                    <li class="row col-12">
+                                        <i class="fab fa-cc-paypal fa-2x col-2"></i>
+                                        <i class="fab fa-cc-visa fa-2x col-2"></i>
+                                        <i class="fab fa-cc-mastercard fa-2x col-2"></i>
+                                        <i class="fab fa-cc-apple-pay fa-2x col-2"></i>
+                                        <i class="fab fa-cc-amazon-pay fa-2x col-2"></i>
+                                        <i class="fab fa-cc-amex fa-2x col-2"></i>
+                                    </li>
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="${'/pay_order'}" method="post">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label th:text="#{label.fullname}"></label>
+                                        <input type="text" class="form-control" name="fullname" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label th:text="#{label.card-number}"></label>
+                                        <input type="tel" class="form-control" name="card" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label th:text="#{label.expiration}"></label>
+                                            <input type="month" class="form-control" name="expiration_date" required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label>CVV</label>
+                                            <input type="number" class="form-control" name="cvv" min="0" max="999" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                                    <button type="submit" class="btn btn-dark" th:text="#{button.pay}"></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>

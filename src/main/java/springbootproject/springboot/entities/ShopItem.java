@@ -56,4 +56,7 @@ public class ShopItem {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Category> categories;
 
+    @OneToMany(mappedBy = "shopItem")
+    private List<ShopitemOrder> orderAssociation;
+
 }

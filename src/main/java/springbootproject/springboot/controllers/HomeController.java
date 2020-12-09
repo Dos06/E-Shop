@@ -54,6 +54,10 @@ public class HomeController {
     @Autowired
     private PictureService pictureService;
     @Autowired
+    private OrderService orderService;
+    @Autowired
+    private ShopitemOrderService shopitemOrderService;
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Value("${file.avatar.viewPath}")
@@ -365,6 +369,33 @@ public class HomeController {
 
 
 
+    @PostMapping(value = "/pay_order")
+    public String payOrder(Model model) {
+        String redirect = "error";
+
+        Map<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
+        List<ShopItem> shopItemsList = new ArrayList<>();
+        for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+            shopItemsList.add(entry.getKey());
+            shopitemOrderService.addShopitemOrder(new ShopitemOrder());
+        }
+
+        session.setAttribute("cart", new HashMap<ShopItem, Integer>());
+        session.setAttribute("totalQuantity", 0);
+        session.setAttribute("totalAmount", 0);
+
+        return "redirect:/cart?" + redirect;
+    }
+
+
+    @PostMapping(value = "/delete-cart")
+    public String deleteCart(Model model) {
+        session.setAttribute("cart", new HashMap<ShopItem, Integer>());
+        session.setAttribute("totalQuantity", 0);
+        session.setAttribute("totalAmount", 0);
+
+        return "redirect:/cart?success";
+    }
 
     @PostMapping(value = "/delete_item_from_cart")
     public String deleteShopItemFromCart(
@@ -636,7 +667,7 @@ public class HomeController {
 
         Brand brand = shopItemService.getBrand(brand_id);
         if (brand != null)
-            shopItemService.addShopItem(new ShopItem(0, name, description, price, amount, stars, pictureURL, pictureURLlrg, top, brand, null));
+            shopItemService.addShopItem(new ShopItem(0, name, description, price, amount, stars, pictureURL, pictureURLlrg, top, brand, null, null));
 
         return "redirect:/admin";
     }
