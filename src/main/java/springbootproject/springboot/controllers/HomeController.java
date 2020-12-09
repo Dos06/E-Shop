@@ -18,6 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import springbootproject.springboot.entities.*;
 import springbootproject.springboot.services.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,10 +29,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class HomeController {
+
+    @Autowired
+    private HttpSession session;
 
     @Autowired
     private ShopItemService shopItemService;
@@ -59,6 +68,24 @@ public class HomeController {
     @Value("${file.shopitem.uploadPath}")
     private String uploadPathShopItems;
 
+    private void checkCartSession() {
+        HashMap<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
+        if (cart == null) {
+            session.setAttribute("cart", new HashMap<ShopItem, Integer>());
+            session.setAttribute("totalQuantity", 0);
+            session.setAttribute("totalAmount", 0);
+        } else {
+            double totalAmount = 0;
+            int totalQuantity = 0;
+            for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+                totalQuantity += entry.getValue();
+                totalAmount += entry.getKey().getPrice() * entry.getValue();
+            }
+            session.setAttribute("totalAmount", totalAmount);
+            session.setAttribute("totalQuantity", totalQuantity);
+        }
+    }
+
     @GetMapping(value = "/")
     public String index(Model model) {
         List<ShopItem> shopItems = shopItemService.getTopShopItems();
@@ -74,6 +101,8 @@ public class HomeController {
         model.addAttribute("categories", categories);
 
         model.addAttribute("currentUser", getUserData());
+
+        checkCartSession();
 
         return "index";
     }
@@ -102,6 +131,8 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        checkCartSession();
+
         return "search";
     }
 
@@ -125,6 +156,8 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        checkCartSession();
+
         return "details";
     }
 
@@ -146,6 +179,8 @@ public class HomeController {
         model.addAttribute("pictures", pictures);
 
         model.addAttribute("currentUser", getUserData());
+
+        checkCartSession();
 
         return "properties";
     }
@@ -173,6 +208,8 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        checkCartSession();
+
         return "admin";
     }
 
@@ -188,6 +225,8 @@ public class HomeController {
         model.addAttribute("categories", categories);
 
         model.addAttribute("currentUser", getUserData());
+
+        checkCartSession();
 
         return "403";
     }
@@ -206,6 +245,8 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        checkCartSession();
+
         return "login";
     }
 
@@ -222,6 +263,8 @@ public class HomeController {
         model.addAttribute("categories", categories);
 
         model.addAttribute("currentUser", getUserData());
+
+        checkCartSession();
 
         return "signup";
     }
@@ -240,6 +283,8 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        checkCartSession();
+
         return "profile";
     }
 
@@ -255,6 +300,9 @@ public class HomeController {
         model.addAttribute("categories", categories);
 
         model.addAttribute("currentUser", getUserData());
+
+        checkCartSession();
+        model.addAttribute("cart", session.getAttribute("cart"));
 
         return "cart";
     }
@@ -303,8 +351,7 @@ public class HomeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if ( !(authentication instanceof AnonymousAuthenticationToken) ) {
             org.springframework.security.core.userdetails.User secUser = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-            User myUser = userService.getUserByEmail(secUser.getUsername());
-            return myUser;
+            return userService.getUserByEmail(secUser.getUsername());
         }
         return null;
     }
@@ -317,6 +364,92 @@ public class HomeController {
 
 
 
+
+
+    @PostMapping(value = "/delete_item_from_cart")
+    public String deleteShopItemFromCart(
+            @RequestParam(name = "shopitem_id") int shopitemId
+    ) {
+        String redirect = "error";
+
+        ShopItem shopItem = shopItemService.getShopItem(shopitemId);
+        HashMap<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
+        if (cart != null && shopItem != null) {
+            for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+                if (entry.getKey().getId() == shopitemId) {
+                    if (entry.getValue() > 0) {
+                        entry.setValue(entry.getValue() - 1);
+                        break;
+                    }
+                }
+            }
+            redirect = "success";
+        }
+        session.setAttribute("cart", cart);
+
+        return "redirect:/cart?" + redirect;
+    }
+
+
+    @PostMapping(value = "/add_item_to_cart")
+    public String addShopItemToCart(
+            @RequestParam(name = "shopitem_id") int shopitemId,
+            @RequestParam(name = "cart_id", defaultValue = "0") String isCart,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String redirect = "error";
+        if (isCart.equals("0")) {
+            isCart = "properties/" + shopitemId;
+        } else {
+            isCart = "cart";
+        }
+
+        HashMap<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
+        if (cart != null && cart.size() > 0) {
+            boolean added = false;
+            for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+                ShopItem keyShopItem = entry.getKey();
+                if (keyShopItem.getId() == shopitemId) {
+                    entry.setValue(entry.getValue() + 1);
+                    added = true;
+                    redirect = "success";
+                    break;
+                }
+            }
+            if (!added) {
+                cart.put(shopItemService.getShopItem(shopitemId), 1);
+            }
+        } else {
+            cart = new HashMap<>();
+            cart.put(shopItemService.getShopItem(shopitemId), 1);
+            redirect = "success";
+        }
+        session.setAttribute("cart", cart);
+
+
+        double totalAmount = 0;
+        int totalQuantity = 0;
+        for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+            totalQuantity += entry.getValue();
+            totalAmount += entry.getKey().getPrice() * entry.getValue();
+        }
+        session.setAttribute("totalAmount", totalAmount);
+        session.setAttribute("totalQuantity", totalQuantity);
+
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("JSESSIONID")) {
+                cookie.setMaxAge(60 * 60);
+                response.addCookie(cookie);
+                break;
+            }
+        }
+        System.out.println("redirect:/" + isCart + "?" + redirect);
+
+        return "redirect:/" + isCart + "?" + redirect;
+    }
 
 
     @PostMapping(value = "/upload_shopitem_photo")

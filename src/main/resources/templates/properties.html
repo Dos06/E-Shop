@@ -33,24 +33,21 @@
                         <h3 th:text="${shopitem.brand.name} + ' - ' + ${shopitem.brand.country.name}" class="text-danger"></h3>
                         <h1 th:text="'$ ' + ${shopitem.price}" class="my-4"></h1>
                         <p th:text="${shopitem.description}" style="font-size: 24px;"></p>
-                        <div>
+                        <div class="mb-4">
                             <small class="text-muted">
-                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 1}" style="color: orange;"></span>
-                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 1}" style="color: grey;"></span>
-
-                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 2}" style="color: orange;"></span>
-                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 2}" style="color: grey;"></span>
-
-                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 3}" style="color: orange;"></span>
-                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 3}" style="color: grey;"></span>
-
-                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 4}" style="color: orange;"></span>
-                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 4}" style="color: grey;"></span>
-
-                                <span th:class="${'fa fa-star fa-2x'}" th:if="${shopitem.stars >= 5}" style="color: orange;"></span>
-                                <span th:class="${'fa fa-star fa-2x'}" th:unless="${shopitem.stars >= 5}" style="color: grey;"></span>
+                                <div class="d-inline" th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <span class="fa fa-star fa-2x" th:if="${shopitem.stars >= i}" style="color: orange;"></span>
+                                    <span class="fa fa-star fa-2x" th:unless="${shopitem.stars >= i}" style="color: grey;"></span>
+                                </div>
                             </small>
                         </div>
+                        <form th:action="@{'/add_item_to_cart'}" method="post">
+                            <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                            <button class="btn btn-dark btn-lg" th:inline="text">
+                                <i class="fas fa-shopping-cart"></i>
+                                [[#{label.add-to-cart}]]
+                            </button>
+                        </form>
                     </div>
                     <div class="col-sm-6">
                         <img th:src="${shopitem.pictureURLlrg}" class="w-100 rounded">

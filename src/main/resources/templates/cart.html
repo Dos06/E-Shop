@@ -6,64 +6,40 @@
         <div class="row mt-4">
             <div class="col-12">
 
-                <div th:if="${param.error != null}" class="alert alert-dark alert-dismissible fade show col-sm-8 offset-sm-2" role="alert">
-                    <strong th:text="#{label.incorrect-values}"></strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div th:if="${param.success != null}" class="alert alert-success alert-dismissible fade show col-sm-8 offset-sm-2" role="alert">
-                    <strong th:text="#{label.saved}"></strong>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
                 <table class="table table-bordered table-striped table-hover">
                     <thead class="text-light bg-dark">
                         <tr>
                             <td th:text="#{label.name}"></td>
                             <td th:text="#{label.price}"></td>
-                            <td th:text="#{label.quantity}"></td>
                             <td th:text="#{label.amount}"></td>
-                            <td th:text="#{label.operations}"></td>
+                            <td width="20%" th:text="#{label.quantity}"></td>
                         </tr>
                     </thead>
                     <tbody>
-<!--                        <tr th:each="item : ${cart}">-->
-<!--                            <td th:text="${item.shopitem.name}"></td>-->
-<!--                            <td th:text="${item.shopitem.price}"></td>-->
-<!--                            <td th:text="${item.quantity}"></td>-->
-<!--                            <td th:text="${item.shopitem.price * item.quantity}"></td>-->
-<!--                            <td th:text="${item.shopitem.price * item.quantity}"></td>-->
-<!--                        </tr>-->
-                            <tr>
-                                <td th:text="'xiaomi'"></td>
-                                <td th:text="'150'"></td>
-                                <td th:text="'3'"></td>
-                                <td th:text="'450'"></td>
-                                <td class="row mx-0">
-                                    <div class="qty">
-                                        <span class="minus bg-dark">-</span>
-                                        <input type="number" class="count" name="qty" value="1">
-                                        <span class="plus bg-dark">+</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td th:text="'xiaomi'"></td>
-                            </tr>
-                            <tr>
-                                <td th:text="'xiaomi'"></td>
-                            </tr>
-                            <tr>
-                                <td th:text="'xiaomi'"></td>
-                            </tr>
+                        <tr th:each="item : ${cart}" th:if="${item.getValue() > 0}">
+                            <td th:text="${item.getKey().name}"></td>
+                            <td th:text="${item.getKey().price}"></td>
+                            <td th:text="${item.getKey().price * item.getValue()}"></td>
+                            <td class="row mx-0">
+                                <div class="qty">
+                                    <form th:action="${'/delete_item_from_cart'}" method="post" class="d-inline">
+                                        <input type="hidden" name="shopitem_id" th:value="${item.getKey().id}">
+                                        <button class="minus bg-dark">-</button>
+                                    </form>
+                                    <input readonly type="number" class="count" name="qty" th:value="${item.getValue()}">
+                                    <form th:action="${'/add_item_to_cart'}" method="post" class="d-inline">
+                                        <input type="hidden" name="shopitem_id" th:value="${item.getKey().id}">
+                                        <input type="hidden" name="cart_id" th:value="${item.getKey().id}">
+                                        <button class="plus bg-dark m-0">+</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
 
-                            <tr>
-                                <td colspan="3" ><h2 th:text="#{label.total-to-pay} + ':'"></h2></td>
-                                <td><h2 th:text="'$ 0'"></h2></td>
-                            </tr>
+                        <tr>
+                            <td colspan="2"><h2 th:text="#{label.total-to-pay} + ':'"></h2></td>
+                            <td colspan="2"><h2 th:text="'$ ' + ${session.totalAmount}"></h2></td>
+                        </tr>
                     </tbody>
                 </table>
 

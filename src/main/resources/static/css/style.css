@@ -248,29 +248,14 @@ ul.ks-cboxtags li div form input[type="checkbox"]:focus + label {
     font: 30px/1 Arial,sans-serif;
     text-align: center;
     border-radius: 50%;
-    background-clip: padding-box;
-}
-.minus:hover{
-    background-color: #717fe0 !important;
-}
-.plus:hover{
-    background-color: #717fe0 !important;
 }
 /*Prevent text selection*/
-span{
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
 input{
     border: 0;
     width: 2%;
 }
-nput::-webkit-outer-spin-button,
+input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
-}
-input:disabled{
-    background-color:white;
 }
