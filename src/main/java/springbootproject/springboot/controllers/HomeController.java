@@ -209,6 +209,9 @@ public class HomeController {
 
         model.addAttribute("currentUser", getUserData());
 
+        model.addAttribute("orders", orderService.getAllOrders());
+        model.addAttribute("shopitemOrders", shopitemOrderService.getAllShopitemOrders());
+
         checkCartSession();
 
         return "admin";

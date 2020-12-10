@@ -31,6 +31,7 @@
                 <li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="list-group-item"><a th:href="@{'#brands'}" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseBrands" class="text-dark"><i class="fas fa-copyright"></i> <span th:text="#{label.brands}"></span></a></li>
                 <li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="list-group-item"><a th:href="@{'#countries'}" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCountries" class="text-dark"><i class="fas fa-globe-americas"></i> <span th:text="#{label.countries}"></span></a></li>
                 <li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="list-group-item"><a th:href="@{'#categories'}" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseCategories" class="text-dark"><i class="fas fa-tags"></i> <span th:text="#{label.categories}"></span></a></li>
+                <li sec:authorize="hasAnyRole('ROLE_ADMIN')" class="list-group-item"><a th:href="@{'#orders'}" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseOrders" class="text-dark"><i class="fas fa-money-bill"></i> <span th:text="#{label.orders}"></span></a></li>
             </ul>
         </div>
 
