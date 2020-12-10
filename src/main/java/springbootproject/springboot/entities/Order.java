@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -19,9 +18,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "buyer_name")
+    private String buyerName;
+
     @Column(name = "date")
     private LocalDate date = LocalDate.now();
-
-    @OneToMany(mappedBy = "order")
-    private List<ShopitemOrder> shopitemAssociation;
 }

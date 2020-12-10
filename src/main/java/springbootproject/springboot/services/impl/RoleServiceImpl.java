@@ -3,7 +3,6 @@ package springbootproject.springboot.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import springbootproject.springboot.entities.Role;
-import springbootproject.springboot.entities.User;
 import springbootproject.springboot.repositories.RoleRepository;
 import springbootproject.springboot.services.RoleService;
 

@@ -28,10 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -370,26 +367,43 @@ public class HomeController {
 
 
     @PostMapping(value = "/pay_order")
-    public String payOrder(Model model) {
+    public String payOrder(
+            @RequestParam(name = "fullname") String fullName,
+            @RequestParam(name = "card") String card,
+            @RequestParam(name = "expiration_date") String expirationDate,
+            @RequestParam(name = "cvv") String cvv
+    ) {
         String redirect = "error";
 
-        Map<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
-        List<ShopItem> shopItemsList = new ArrayList<>();
-        for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
-            shopItemsList.add(entry.getKey());
-            shopitemOrderService.addShopitemOrder(new ShopitemOrder());
-        }
+        if (card != null && cvv != null && !card.equals("") && !cvv.equals("")) {
+            Map<ShopItem, Integer> cart = (HashMap<ShopItem, Integer>) session.getAttribute("cart");
+            Set<ShopitemOrder> shopItemsSet = new HashSet<>();
+            Order order = new Order();
+            order.setBuyerName(fullName);
+            orderService.addOrder(order);
+            for (Map.Entry<ShopItem, Integer> entry : cart.entrySet()) {
+                if (entry.getValue() > 0) {
+                    ShopitemOrder shopitemOrder = new ShopitemOrder();
+                    shopitemOrder.setOrder(order);
+                    shopitemOrder.setShopItem(entry.getKey());
+                    shopitemOrder.setQuantity(entry.getValue());
 
-        session.setAttribute("cart", new HashMap<ShopItem, Integer>());
-        session.setAttribute("totalQuantity", 0);
-        session.setAttribute("totalAmount", 0);
+                    shopItemsSet.add(shopitemOrder);
+                    shopitemOrderService.addShopitemOrder(shopitemOrder);
+                }
+            }
+            session.setAttribute("cart", new HashMap<ShopItem, Integer>());
+            session.setAttribute("totalQuantity", 0);
+            session.setAttribute("totalAmount", 0);
+            redirect = "success";
+        }
 
         return "redirect:/cart?" + redirect;
     }
 
 
     @PostMapping(value = "/delete-cart")
-    public String deleteCart(Model model) {
+    public String deleteCart() {
         session.setAttribute("cart", new HashMap<ShopItem, Integer>());
         session.setAttribute("totalQuantity", 0);
         session.setAttribute("totalAmount", 0);
@@ -477,7 +491,6 @@ public class HomeController {
                 break;
             }
         }
-        System.out.println("redirect:/" + isCart + "?" + redirect);
 
         return "redirect:/" + isCart + "?" + redirect;
     }
@@ -554,16 +567,12 @@ public class HomeController {
             String pass = passwordEncoder.encode(oldpassword);
 //            if (pass.equals(user.getPassword()) && newpassword.equals(repassword)) {
             if (newpassword.equals(repassword)) {
-                System.out.println(111 + " " + oldpassword + " --- " + newpassword + "   --- " + repassword);
                 user.setPassword(newpassword);
                 userService.saveUser(user);
                 model.addAttribute("currentUser", getUserData());
                 redirect = "success";
-                System.out.println("test");
             }
-            System.out.println(pass);
         }
-        System.out.println(user.getPassword());
         return "redirect:/profile?" + redirect;
     }
 
@@ -666,8 +675,19 @@ public class HomeController {
             ) {
 
         Brand brand = shopItemService.getBrand(brand_id);
-        if (brand != null)
-            shopItemService.addShopItem(new ShopItem(0, name, description, price, amount, stars, pictureURL, pictureURLlrg, top, brand, null, null));
+        if (brand != null) {
+            ShopItem shopItem = new ShopItem();
+            shopItem.setName(name);
+            shopItem.setDescription(description);
+            shopItem.setPrice(price);
+            shopItem.setAmount(amount);
+            shopItem.setStars(stars);
+            shopItem.setPictureURL(pictureURL);
+            shopItem.setPictureURLlrg(pictureURLlrg);
+            shopItem.setTop(top);
+            shopItem.setBrand(brand);
+            shopItemService.addShopItem(shopItem);
+        }
 
         return "redirect:/admin";
     }

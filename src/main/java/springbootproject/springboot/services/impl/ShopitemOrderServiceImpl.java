@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class ShopitemOrderServiceImpl implements ShopitemOrderService {
     @Autowired
-    ShopitemOrderRepository shopitemOrderRepository;
+    private ShopitemOrderRepository shopitemOrderRepository;
 
     @Override
     public ShopitemOrder addShopitemOrder(ShopitemOrder shopitemOrder) {

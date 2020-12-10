@@ -3,10 +3,8 @@ package springbootproject.springboot.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -45,18 +43,10 @@ public class ShopItem {
     @Column(name = "top", columnDefinition = "tinyint(1) default 0")
     private boolean top;
 
-//    @Column(name = "addeddate")
-//    @Temporal(TemporalType.DATE)
-//    @CreationTimestamp
-//    private LocalDate addedDate = LocalDate.now();
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Brand brand;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Category> categories;
-
-    @OneToMany(mappedBy = "shopItem")
-    private List<ShopitemOrder> orderAssociation;
-
 }
