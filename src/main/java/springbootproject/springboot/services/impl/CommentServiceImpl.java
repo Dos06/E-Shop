@@ -43,11 +43,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> getAllByShopItem(ShopItem shopItem) {
-        return commentRepository.findAllByShopItem(shopItem);
+        return commentRepository.findAllByShopItemOrderByAddedDateDesc(shopItem);
     }
 
     @Override
     public List<Comment> getAllByAuthor(User author) {
-        return commentRepository.findAllByAuthor(author);
+        return commentRepository.findAllByAuthorOrderByAddedDate(author);
     }
 }

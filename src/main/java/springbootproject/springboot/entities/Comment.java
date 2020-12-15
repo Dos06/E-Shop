@@ -22,7 +22,7 @@ public class Comment {
     private String comment;
 
     @Column(name = "added_date")
-    private LocalDateTime localDateTime = LocalDateTime.now();
+    private LocalDateTime addedDate = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ShopItem shopItem;

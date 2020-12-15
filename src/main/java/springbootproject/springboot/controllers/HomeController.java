@@ -56,6 +56,8 @@ public class HomeController {
     private ShopitemOrderService shopitemOrderService;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private CommentService commentService;
 
     @Value("${file.avatar.viewPath}")
     private String viewPathAvatars;
@@ -180,6 +182,8 @@ public class HomeController {
         model.addAttribute("pictures", pictures);
 
         model.addAttribute("currentUser", getUserData());
+
+        model.addAttribute("comments", commentService.getAllByShopItem(shopItem));
 
         checkCartSession();
 
@@ -366,8 +370,58 @@ public class HomeController {
 
 
 
+    @PostMapping(value = "/delete-comment")
+    public String deleteComment(
+            @RequestParam(name = "shopitem_id") int shopItemId,
+            @RequestParam(name = "comment_id") int commentId
+    ) {
+        String redirect = "?error";
+        Comment comment = commentService.getComment(commentId);
+        if (comment != null) {
+            commentService.deleteComment(comment);
+            redirect = "#comments";
+        }
+        return "redirect:/properties/" + shopItemId + redirect;
+    }
 
+    @PostMapping(value = "/edit-comment")
+    public String editComment(
+            @RequestParam(name = "shopitem_id") int shopItemId,
+            @RequestParam(name = "author_id") int authorId,
+            @RequestParam(name = "comment") String commentText,
+            @RequestParam(name = "comment_id") int commentId
+    ) {
+        String redirect = "?error";
+        ShopItem shopItem = shopItemService.getShopItem(shopItemId);
+        User author = userService.getUser(authorId);
+        Comment comment = commentService.getComment(commentId);
+        if (author != null && shopItem != null && comment != null) {
+            comment.setComment(commentText);
+            commentService.addComment(comment);
+            redirect = "#comments";
+        }
+        return "redirect:/properties/" + shopItemId + redirect;
+    }
 
+    @PostMapping(value = "/add-comment")
+    public String addComment(
+            @RequestParam(name = "shopitem_id") int shopItemId,
+            @RequestParam(name = "author_id") int authorId,
+            @RequestParam(name = "comment") String commentText
+    ) {
+        String redirect = "?error";
+        ShopItem shopItem = shopItemService.getShopItem(shopItemId);
+        User author = userService.getUser(authorId);
+        if (author != null && shopItem != null) {
+            Comment comment = new Comment();
+            comment.setComment(commentText);
+            comment.setAuthor(author);
+            comment.setShopItem(shopItem);
+            commentService.addComment(comment);
+            redirect = "#comments";
+        }
+        return "redirect:/properties/" + shopItemId + redirect;
+    }
 
     @PostMapping(value = "/pay_order")
     public String payOrder(
@@ -495,7 +549,8 @@ public class HomeController {
             }
         }
 
-        return "redirect:/" + isCart + "?" + redirect;
+//        return "redirect:/" + isCart + "?" + redirect;
+        return "redirect:/" + isCart;
     }
 
 

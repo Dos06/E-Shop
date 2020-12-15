@@ -1,9 +1,18 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layout/main.html">
+      layout:decorator="layout/main.html"
+      xmlns:sec = "http://www.thymeleaf.org/extras/spring-security">
 
     <div layout:fragment="site_content">
         <div class="row mt-4">
+
+            <nav aria-label="breadcrumb" class="w-100">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{'/'}" th:text="#{label.home}"></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{'/search'}" th:text="#{button.search}"></a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${shopitem.name}"></li>
+                </ol>
+            </nav>
 
             <ul class="ks-cboxtags row mt-2">
                 <li th:each="category : ${categories}">
@@ -59,6 +68,93 @@
                 </div>
 
 
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="alert alert-secondary shadow my-4 col-12">
+                <div class="row">
+                    <form th:action="${'/add-comment'}" class="col-12 m-0" method="post">
+                        <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                        <input type="hidden" name="author_id" th:value="${currentUser.id}">
+                        <textarea class="form-control col-12" name="comment" cols="30" rows="3"></textarea>
+                        <button class="btn btn-dark mt-3" th:inline="text">
+                            <i class="fas fa-comment"></i>
+                            [[#{button.add-comment}]]
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+
+            <div th:if="${comments != null && comments.size() > 0}" id="comments" class="my-4 w-100 shadow">
+                <div th:each="comment : ${comments}" class="card w-100" style="background-color: #fafafa;">
+                    <div class="row card-body">
+                        <div class="col-10">
+                            <h4 th:text="${comment.author.fullName}"></h4>
+                            <h6 th:text="${comment.comment}"></h6>
+                        </div>
+                        <div class="col-2">
+                            <p th:text="${#temporals.format(comment.addedDate, 'dd.MM.yyyy - HH:mm')}"></p>
+                            <div th:if="${currentUser != null && currentUser.id == comment.author.id}" class="row col-12 justify-content-around">
+                                <button type="button" class="btn btn-dark" data-toggle="modal" th:data-target="${'#editModal' + comment.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" th:data-target="${'#deleteModal' + comment.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal fade" th:id="${'editModal' + comment.id}" tabindex="-1" role="dialog" th:aria-labelledby="${'editModalLabel' + comment.id}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:id="${'editModalLabel' + comment.id}" th:text="#{label.edit}"></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form th:action="${'/edit-comment'}" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                        <input type="hidden" name="author_id" th:value="${comment.author.id}">
+                                        <input type="hidden" name="comment_id" th:value="${comment.id}">
+                                        <textarea class="form-control" name="comment" cols="30" rows="3" th:text="${comment.comment}"></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                                        <button type="submit" class="btn btn-dark" th:text="#{button.save}"></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" th:id="${'deleteModal' + comment.id}" tabindex="-1" role="dialog" th:aria-labelledby="${'deleteModalLabel' + comment.id}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" th:id="${'deleteModalLabel' + comment.id}" th:text="#{label.delete}"></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form th:action="${'/delete-comment'}" method="post">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                        <input type="hidden" name="comment_id" th:value="${comment.id}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
+                                        <button type="submit" class="btn btn-danger" th:text="#{button.delete}"></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
         </div>

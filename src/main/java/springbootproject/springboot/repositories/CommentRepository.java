@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 @Transactional
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
-    List<Comment> findAllByShopItem(ShopItem shopItem);
-    List<Comment> findAllByAuthor(User author);
+    List<Comment> findAllByShopItemOrderByAddedDateDesc(ShopItem shopItem);
+    List<Comment> findAllByAuthorOrderByAddedDate(User author);
 }
