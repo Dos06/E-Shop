@@ -465,7 +465,8 @@ public class HomeController {
         session.setAttribute("totalQuantity", 0);
         session.setAttribute("totalAmount", 0);
 
-        return "redirect:/cart?success";
+//        return "redirect:/cart?success";
+        return "redirect:/cart";
     }
 
     @PostMapping(value = "/delete_item_from_cart")
@@ -489,7 +490,8 @@ public class HomeController {
         }
         session.setAttribute("cart", cart);
 
-        return "redirect:/cart?" + redirect;
+//        return "redirect:/cart?" + redirect;
+        return "redirect:/cart";
     }
 
 
