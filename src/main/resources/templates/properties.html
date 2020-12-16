@@ -102,6 +102,11 @@
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
+                            <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MODERATOR')" th:if="${currentUser != null && currentUser.id != comment.author.id}" class="row col-12 justify-content-around">
+                                <button type="button" class="btn btn-danger" data-toggle="modal" th:data-target="${'#deleteModal' + comment.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -141,10 +146,8 @@
                                     </button>
                                 </div>
                                 <form th:action="${'/delete-comment'}" method="post">
-                                    <div class="modal-body">
-                                        <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
-                                        <input type="hidden" name="comment_id" th:value="${comment.id}">
-                                    </div>
+                                    <input type="hidden" name="shopitem_id" th:value="${shopitem.id}">
+                                    <input type="hidden" name="comment_id" th:value="${comment.id}">
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{button.cancel}"></button>
                                         <button type="submit" class="btn btn-danger" th:text="#{button.delete}"></button>
