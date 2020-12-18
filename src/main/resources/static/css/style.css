@@ -4,6 +4,10 @@
 /*    overflow-y: hidden;*/
 /*}*/
 
+img {
+    object-fit: cover;
+}
+
 /* CHECKBOX */
 ul.ks-cboxtags {
     list-style: none;

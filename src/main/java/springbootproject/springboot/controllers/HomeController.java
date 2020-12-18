@@ -316,7 +316,7 @@ public class HomeController {
     }
 
     @GetMapping(value = "/viewphoto/{url}", produces = {MediaType.IMAGE_JPEG_VALUE})
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public @ResponseBody byte[] viewProfilePhoto(@PathVariable(name = "url") String url) throws IOException {
         String pictureUrl = viewPathAvatars + "/" + defaultPicture;
         if (url != null && !url.equals("null")) {

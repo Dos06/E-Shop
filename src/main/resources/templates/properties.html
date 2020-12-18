@@ -88,7 +88,9 @@
             <div th:if="${comments != null && comments.size() > 0}" id="comments" class="my-4 w-100 shadow">
                 <div th:each="comment : ${comments}" class="card w-100" style="background-color: #fafafa;">
                     <div class="row card-body">
-                        <div class="col-10">
+                        <img class="col-1 rounded-circle" th:src="@{'/viewphoto/' + ${comment.author.pictureUrl}}" style="width: 80px; height: 80px;">
+
+                        <div class="col-9">
                             <h4 th:text="${comment.author.fullName}"></h4>
                             <h6 th:text="${comment.comment}"></h6>
                         </div>
