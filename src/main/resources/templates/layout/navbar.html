@@ -20,7 +20,7 @@
     </ul>
     <a th:href="${'/cart'}" class="nav-link text-light my-1" th:inline="text">
         <i class="fas fa-shopping-cart"></i>
-        [['Cart (' + ${session.totalQuantity} + ')']]
+        [[#{label.cart} + ' (' + ${session.totalQuantity} + ')']]
     </a>
     <a th:href="${'/profile'}" sec:authorize="isAuthenticated()" class="nav-link text-light my-1" th:text="${currentUser.fullName}"></a>
     <a class="btn btn-secondary btn-sm" href="/login" sec:authorize="isAnonymous()" th:text="#{button.signin}"></a>
